@@ -14,6 +14,11 @@ return new class extends Migration
         Schema::create('telegramas', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
+            $table->string('usuarioCarga');
+            $table->integer('votoBlanco');
+            $table->integer('votoNulo');
+            $table->integer('votoRecurrido');
+            $table->foreignId('usuario_id')->constrained('usuarios');
         });
     }
 
