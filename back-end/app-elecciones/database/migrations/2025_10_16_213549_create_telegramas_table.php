@@ -11,19 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasTable('telegramas')) {
-            Schema::create('telegramas', function (Blueprint $table) {
-                $table->id();
-                $table->foreignId('mesa_id')->constrained('mesas');
-                $table->foreignId('lista_id')->constrained('listas');
-                $table->integer('votos_Diputados');
-                $table->integer('votos_Senadores');
-                $table->integer('voto_Blanco');
-                $table->integer('voto_Nulo');
-                $table->integer('voto_Recurrido');
-                $table->timestamps();
-            });
-        }
+        
+        Schema::create('telegramas', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('mesa_id')->constrained('mesas');
+            $table->foreignId('lista_id')->constrained('listas');
+            $table->integer('votos_Diputados');
+            $table->integer('votos_Senadores');
+            $table->integer('voto_Blanco');
+            $table->integer('voto_Nulo');
+            $table->integer('voto_Recurrido');
+            $table->timestamps();
+        });
+        
     }
 
     /**
