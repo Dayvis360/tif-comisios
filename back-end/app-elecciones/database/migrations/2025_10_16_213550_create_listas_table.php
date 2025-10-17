@@ -13,6 +13,10 @@ return new class extends Migration
     {
         Schema::create('listas', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('provincia_id')->constrained('provincias');
+            $table->string('cargo');
+            $table->string('nombre_lista');
+            $table->string('alianza');
             $table->timestamps();
         });
     }

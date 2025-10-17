@@ -13,6 +13,9 @@ return new class extends Migration
     {
         Schema::create('candidatos', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('lista_id')->constrained('listas');
+            $table->string('nombre');
+            $table->integer('orden_en_lista');
             $table->timestamps();
         });
     }
