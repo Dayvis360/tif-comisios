@@ -6,7 +6,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
-class test_enter_list extends TestCase
+class MesaTest extends TestCase
 {
     /**
      * A basic feature test example.
