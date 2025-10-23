@@ -3,16 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Models\Lista;
 use App\Models\Mesa;
 use App\Models\Provincia;
 use Illuminate\Http\Request;
+
 use PhpParser\Node\Expr\Cast\Void_;
 
-class ListaController extends Controller
+class MesaController extends Controller
 {
     //
-    public function craerMesa(Request $request) 
+    public function crearMesa(Request $request) 
     {
          $data = $request->validate([
             'provincia' => 'required|string',
@@ -33,4 +33,6 @@ class ListaController extends Controller
         ]);
         return response()->json(['message' => 'Mesa creada con éxito', 'mesa_id' => $Mesa->id], 201);
     }
+        
+
 }
