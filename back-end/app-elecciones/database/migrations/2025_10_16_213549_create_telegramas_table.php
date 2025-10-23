@@ -14,13 +14,13 @@ return new class extends Migration
         
         Schema::create('telegramas', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('mesa_id')->constrained('mesas');
+            $table->foreignId('mesa_id')->constrained('mesas')->cascadeOnDelete();
             $table->foreignId('lista_id')->constrained('listas');
-            $table->integer('votos_Diputados');
-            $table->integer('votos_Senadores');
-            $table->integer('voto_Blanco');
-            $table->integer('voto_Nulo');
-            $table->integer('voto_Recurrido');
+            $table->integer('votos_Diputados')->default(0);
+            $table->integer('votos_Senadores')->default(0);
+            $table->integer('voto_Blanco')->default(0);
+            $table->integer('voto_Nulo')->default(0);
+            $table->integer('voto_Recurrido')->default(0);
             $table->timestamps();
         });
         

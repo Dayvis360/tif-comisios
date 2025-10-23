@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('listas', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('provincia_id')->constrained('provincias');
-            $table->string('cargo');
-            $table->string('nombre_lista');
+            $table->string('nombre');
             $table->string('alianza');
+            $table->string('cargo');
+            $table->foreignId('provincia_id')->constrained('provincias')->cascadeOnDelete();
             $table->timestamps();
         });
     }
