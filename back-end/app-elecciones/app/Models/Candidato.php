@@ -10,7 +10,7 @@ class Candidato extends Model
     use HasFactory;
     protected $fillable = [
         'nombre',
-        'orden_lista',
+        'orden_en_lista',
         'lista_id',
     ];
     public function lista()

@@ -18,9 +18,9 @@ return new class extends Migration
             $table->foreignId('lista_id')->constrained('listas');
             $table->integer('votos_Diputados')->default(0);
             $table->integer('votos_Senadores')->default(0);
-            $table->integer('voto_Blanco')->default(0);
-            $table->integer('voto_Nulo')->default(0);
-            $table->integer('voto_Recurrido')->default(0);
+            $table->integer('voto_Blancos')->default(0);
+            $table->integer('voto_Nulos')->default(0);
+            $table->integer('voto_Recurridos')->default(0);
             $table->timestamps();
         });
         
