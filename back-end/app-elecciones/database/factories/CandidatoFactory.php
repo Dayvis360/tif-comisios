@@ -3,21 +3,19 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use App\Models\Candidato;
+use App\Models\Lista;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Candidato>
- */
 class CandidatoFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
-    public function definition(): array
+    protected $model = Candidato::class;
+
+    public function definition()
     {
         return [
-            //
+            'lista_id' => Lista::factory(), 
+            'nombre' => $this->faker->name,
+            'orden_en_lista' => $this->faker->unique()->numberBetween(1, 20),
         ];
     }
 }

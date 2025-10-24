@@ -14,7 +14,7 @@ class ProvinciaTest extends TestCase
      */
     use RefreshDatabase;
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function puede_listar_provincias()
     {
         Provincia::factory()->create(['nombre' => 'Buenos Aires']);
@@ -27,7 +27,7 @@ class ProvinciaTest extends TestCase
                  ->assertJsonFragment(['nombre' => 'Córdoba']);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function puede_crear_una_provincia()
     {
         $data = ['nombre' => 'Mendoza'];
@@ -40,7 +40,7 @@ class ProvinciaTest extends TestCase
         $this->assertDatabaseHas('provincias', ['nombre' => 'Mendoza']);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function no_puede_crear_provincia_con_nombre_duplicado()
     {
         Provincia::factory()->create(['nombre' => 'Santa Fe']);

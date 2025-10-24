@@ -12,7 +12,7 @@ class ProvinciaFactory extends Factory
     public function definition()
     {
         return [
-            'nombre' => $this->faker->unique()->state, // nombres de provincias ficticias
+            'nombre' => $this->faker->unique()->state, 
         ];
     }
 }
