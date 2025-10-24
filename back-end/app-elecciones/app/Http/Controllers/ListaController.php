@@ -1,22 +1,28 @@
 <?php
 
-namespace Database\Factories;
+namespace App\Http\Controllers;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use App\Models\Lista;
-use App\Models\Provincia;
 
-class ListaFactory extends Factory
+class ListaController extends Controller
 {
-    protected $model = Lista::class;
-
-    public function definition()
+    public function index()
     {
-        return [
-            'provincia_id' => Provincia::factory(), 
-            'cargo' => $this->faker->randomElement(['DIPUTADOS', 'SENADORES']),
-            'nombre' => 'Lista ' . $this->faker->randomLetter(),
-            'alianza' => 'Frente ' . $this->faker->randomLetter(),
-        ];
+        return response()->json(Lista::with('provincia')->get());
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'nombre' => 'required|string',
+            'alianza' => 'nullable|string',
+            'cargo' => 'required|string',
+            'provincia_id' => 'required|exists:provincias,id'
+        ]);
+
+        $lista = Lista::create($validated);
+        return response()->json($lista->load('provincia'), 201);
     }
 }
