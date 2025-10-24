@@ -16,11 +16,11 @@ class TelegramaFactory extends Factory
         return [
             'mesa_id' => Mesa::factory(),
             'lista_id' => Lista::factory(),
-            'votos_diputados' => $this->faker->numberBetween(0, 300),
-            'votos_senadores' => $this->faker->numberBetween(0, 300),
-            'blancos' => $this->faker->numberBetween(0, 20),
-            'nulos' => $this->faker->numberBetween(0, 10),
-            'recurridos' => $this->faker->numberBetween(0, 5),
+            'votos_Diputados' => $this->faker->numberBetween(0, 300),
+            'votos_Senadores' => $this->faker->numberBetween(0, 300),
+            'voto_Blancos' => $this->faker->numberBetween(0, 20),
+            'voto_Nulos' => $this->faker->numberBetween(0, 10),
+            'voto_Recurridos' => $this->faker->numberBetween(0, 5),
         ];
     }
 }
