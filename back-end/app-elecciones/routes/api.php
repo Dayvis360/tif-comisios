@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProvinciaController;
 use App\Http\Controllers\ListaController;
 use App\Http\Controllers\CandidatoController;
+use App\Http\Controllers\MesaController;
 use Illuminate\Support\Facades\Route;
 
 // Listar provincias
@@ -22,3 +23,9 @@ Route::get('/candidatos', [CandidatoController::class, 'index']);
 
 // Crear un nuevo candidato
 Route::post('/candidatos', [CandidatoController::class, 'store']);
+
+// Listar mesas
+Route::get('/mesas', [MesaController::class, 'index']);
+
+// Crear una nueva mesa
+Route::post('/mesas', [MesaController::class, 'store']);
