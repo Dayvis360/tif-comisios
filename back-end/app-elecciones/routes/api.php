@@ -4,6 +4,7 @@ use App\Http\Controllers\ProvinciaController;
 use App\Http\Controllers\ListaController;
 use App\Http\Controllers\CandidatoController;
 use App\Http\Controllers\MesaController;
+use App\Http\Controllers\TelegramaController;
 use Illuminate\Support\Facades\Route;
 
 // Listar provincias
@@ -29,3 +30,9 @@ Route::get('/mesas', [MesaController::class, 'index']);
 
 // Crear una nueva mesa
 Route::post('/mesas', [MesaController::class, 'store']);
+
+// Listar telegramas
+Route::get('/telegramas', [TelegramaController::class, 'index']);
+
+// Crear un nuevo telegrama
+Route::post('/telegramas', [TelegramaController::class, 'store']);
