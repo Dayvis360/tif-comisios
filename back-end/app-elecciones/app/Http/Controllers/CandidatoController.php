@@ -1,21 +1,27 @@
 <?php
 
-namespace Database\Factories;
+namespace App\Http\Controllers;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use App\Models\Candidato;
-use App\Models\Lista;
 
-class CandidatoFactory extends Factory
+class CandidatoController extends Controller
 {
-    protected $model = Candidato::class;
-
-    public function definition()
+    public function index()
     {
-        return [
-            'lista_id' => Lista::factory(), // genera lista automáticamente si no existe
-            'nombre' => $this->faker->name,
-            'orden_en_lista' => $this->faker->unique()->numberBetween(1, 20),
-        ];
+        return response()->json(Candidato::with('lista.provincia')->get());
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'nombre' => 'required|string',
+            'orden_en_lista' => 'required|integer|min:1',
+            'lista_id' => 'required|exists:listas,id'
+        ]);
+
+        $candidato = Candidato::create($validated);
+        return response()->json($candidato->load('lista.provincia'), 201);
     }
 }
