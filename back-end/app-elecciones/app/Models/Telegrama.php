@@ -12,8 +12,8 @@ class Telegrama extends Model
     protected $fillable = [
         'mesa_id',
         'lista_id',
-        'voto_Diputados',
-        'voto_Senadores',
+        'votos_Diputados',
+        'votos_Senadores',
         'voto_Blancos',
         'voto_Nulos',
         'voto_Recurridos'
