@@ -8,4 +8,3 @@ Route::get('/', function () {
 });
 
 
-Route::post('/mesas', [MesaController::class, 'crearMesa']);
