@@ -24,4 +24,26 @@ class CandidatoController extends Controller
         $candidato = Candidato::create($validated);
         return response()->json($candidato->load('lista.provincia'), 201);
     }
+    public function show(Request $request, $id)
+    {
+
+    }
+    public function update (Request $request, $id)
+    {
+        $validated = $request->validate([
+            'nombre' => 'required|string',
+            'orden_en_lista' => 'required|integer|min:1',
+            'lista_id' => 'required|exists:listas,id'
+        ]);
+
+        $candidato = Candidato::findOrFail($id);
+        $candidato->update($validated);
+        return response()->json($candidato->load('lista.provincia'), 200);
+    }
+    public function destroy($id)
+    {
+        $candidato = Candidato::findOrFail($id);
+        $candidato->delete();
+        return response()->json(null, 204);
+    }
 }
