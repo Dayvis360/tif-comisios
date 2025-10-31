@@ -5,7 +5,13 @@ use App\Http\Controllers\ListaController;
 use App\Http\Controllers\CandidatoController;
 use App\Http\Controllers\MesaController;
 use App\Http\Controllers\TelegramaController;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Route;
+
+//hola mundo
+Route::get('/hola', function () {
+    return response()->json(['mensaje' => 'Hola mundo desde el backend']);
+});
 
 // Listar provincias
 Route::get('/provincias', [ProvinciaController::class, 'index']);
