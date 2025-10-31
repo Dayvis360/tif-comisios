@@ -25,4 +25,27 @@ class ListaController extends Controller
         $lista = Lista::create($validated);
         return response()->json($lista->load('provincia'), 201);
     }
+    public function show(Request $request, $id)
+    {
+
+    }
+    public function update (Request $request, $id)
+    {
+        $validated = $request->validate([
+            'nombre' => 'required|string',
+            'alianza' => 'nullable|string',
+            'cargo' => 'required|string',
+            'provincia_id' => 'required|exists:provincias,id'
+        ]);
+
+        $lista = Lista::findOrFail($id);
+        $lista->update($validated);
+        return response()->json($lista->load('provincia'), 200);
+    }
+    public function destroy($id)
+    {
+        $lista = Lista::findOrFail($id);
+        $lista->delete();
+        return response()->json(null, 204);
+    }
 }
