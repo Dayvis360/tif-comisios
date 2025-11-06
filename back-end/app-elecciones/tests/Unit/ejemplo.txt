@@ -1,0 +1,14 @@
+        $mock = Mockery::mock('alias:' . Provincia::class);
+        $controller = new ProvinciaController();
+        $mock->shouldReceive('all')
+             ->once()
+             ->andReturn([
+                 (object)['id' => 1, 'nombre' => 'Buenos Aires'],
+                 (object)['id' => 2, 'nombre' => 'Córdoba']
+             ]);
+
+        $response = $controller->
+        mostrarTodas()
+
+        $response->assertStatus(200);
+        $response->assertJsonFragment(['nombre' => 'Buenos Aires']);
