@@ -25,4 +25,27 @@ class MesaController extends Controller
         $mesa = Mesa::create($validated);
         return response()->json($mesa->load('provincia'), 201);
     }
+    public function dhow ($id)
+    {
+
+    }
+    public function update (Request $request, $id)
+    {
+        $validated = $request->validate([
+            'provincia_id' => 'required|exists:provincias,id',
+            'circuito' => 'required|string',
+            'establecimiento' => 'required|string',
+            'electores' => 'required|integer|min:1'
+        ]);
+
+        $mesa = Mesa::findOrFail($id);
+        $mesa->update($validated);
+        return response()->json($mesa->load('provincia'), 200);
+    }
+    public function destroy($id)
+    {
+        $mesa = Mesa::findOrFail($id);
+        $mesa->delete();
+        return response()->json(null, 204);
+    }
 }

@@ -23,4 +23,26 @@ class ProvinciaController extends Controller
         $provincia = Provincia::create($validated);
         return response()->json($provincia, 201);
     }
+    public function show($id)
+    {
+        
+    }
+    
+    public function update (Request $request,  $id){
+        $validated = $request->validate([
+            'nombre' => 'required|string|unique:provincias,nombre,'.$id
+        ]);
+
+        $provincia = Provincia::findOrFail($id);
+        $provincia->update($validated);
+        return response()->json($provincia, 200);
+    }
+
+    public function destroy($id)
+    {
+        $provincia = Provincia::findOrFail();
+        $provincia->delete();
+        return response()->json(null, 204);
+    }
+    
 }
