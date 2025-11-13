@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Candidato;
 
 class CandidatoController extends Controller
-{
+{   
     public function index()
     {
         return response()->json(Candidato::with('lista.provincia')->get());
@@ -46,4 +46,37 @@ class CandidatoController extends Controller
         $candidato->delete();
         return response()->json(null, 204);
     }
+
+public function resultados($id) 
+{
+    $candidato = Candidato::with('lista.provincia')->findOrFail($id);
+
+    $cargo = $candidato->lista->cargo ?? 'DIPUTADOS';
+
+
+
+
+$totalLista = \DB::table('telegramas')
+        ->where('provincia_id', $candidato->lista->provincia->id)
+
+        ->where('lista_id', $candidato->lista->id)
+
+        ->sum($cargo === 'DIPUTADOS' ? 'votos_diputados' : 'votos_senadores');
+
+    $totalValidos = \DB::table('telegramas')
+        ->where('provincia_id', $candidato->lista->provincia->id)
+        
+        ->sum($cargo === 'DIPUTADOS' ? 'votos_diputados' : 'votos_senadores');
+
+    $porcentaje = $totalValidos > 0 ? round(($totalLista / $totalValidos) * 100, 2) : 0;
+
+    return response()->json([
+        'candidato' => $candidato->nombre,
+        'lista' => $candidato->lista->nombre,
+        'provincia' => $candidato->lista->provincia->nombre,
+        'cargo' => $cargo,
+        'votos_lista' => $totalLista,
+        'porcentaje_en_provincia' => $porcentaje . '%'
+    ]);
+}
 }
