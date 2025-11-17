@@ -25,7 +25,7 @@ class MesaController extends Controller
         $mesa = Mesa::create($validated);
         return response()->json($mesa->load('provincia'), 201);
     }
-    public function dhow ($id)
+    public function show ($id)
     {
 
     }
