@@ -15,7 +15,7 @@ class ListaFactory extends Factory
         return [
             'provincia_id' => Provincia::factory(), 
             'cargo' => $this->faker->randomElement(['DIPUTADOS', 'SENADORES']),
-            'nombre' => 'Lista ' . $this->faker->randomLetter(),
+            'nombre' => $this->faker->unique()->word,  //'Lista ' . $this->faker->randomLetter(),(modificado por que ocurrian errores al craer seeds, porque se repetia)
             'alianza' => 'Frente ' . $this->faker->randomLetter(),
         ];
     }
