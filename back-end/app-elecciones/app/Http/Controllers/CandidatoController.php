@@ -46,8 +46,8 @@ class CandidatoController extends Controller
         $candidato->delete();
         return response()->json(null, 204);
     }
-
-public function resultados($id) 
+    
+/*public function resultados($id) 
 {
     $candidato = Candidato::with('lista.provincia')->findOrFail($id);
 
@@ -79,4 +79,5 @@ $totalLista = \DB::table('telegramas')
         'porcentaje_en_provincia' => $porcentaje . '%'
     ]);
 }
+    */
 }
