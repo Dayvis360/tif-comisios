@@ -4,80 +4,101 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Candidato;
+use App\Services\CandidatoService;
 
+/**
+ * CandidatoController
+ * 
+ * Responsabilidad:
+ * - Recibir peticiones HTTP
+ * - Validar datos de entrada
+ * - Llamar al Service
+ * - Devolver respuestas HTTP
+ */
 class CandidatoController extends Controller
 {   
-    public function index()
+    private CandidatoService $candidatoService;
+
+    public function __construct(CandidatoService $candidatoService)
     {
-        return response()->json(Candidato::with('lista.provincia')->get());
+        $this->candidatoService = $candidatoService;
     }
 
+    /**
+     * GET /api/candidatos
+     */
+    public function index()
+    {
+        $candidatos = $this->candidatoService->listarCandidatos();
+        return response()->json($candidatos, 200);
+    }
+
+    /**
+     * GET /api/candidatos/{id}
+     */
+    public function show(Request $request, $id)
+    {
+        $candidato = $this->candidatoService->obtenerCandidato($id);
+
+        if (!$candidato) {
+            return response()->json(['mensaje' => 'Candidato no encontrado'], 404);
+        }
+
+        return response()->json($candidato, 200);
+    }
+
+    /**
+     * POST /api/candidatos
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nombre' => 'required|string',
+            'nombre' => 'required|string|max:255',
             'orden_en_lista' => 'required|integer|min:1',
             'lista_id' => 'required|exists:listas,id'
         ]);
 
-        $candidato = Candidato::create($validated);
-        return response()->json($candidato->load('lista.provincia'), 201);
+        try {
+            $candidato = $this->candidatoService->registrarCandidato($validated);
+            return response()->json($candidato, 201);
+        } catch (\InvalidArgumentException $e) {
+            return response()->json(['mensaje' => $e->getMessage()], 422);
+        } catch (\Exception $e) {
+            return response()->json(['mensaje' => 'Error al registrar el candidato', 'error' => $e->getMessage()], 500);
+        }
     }
-    public function show(Request $request, $id)
-    {
 
-    }
-    public function update (Request $request, $id)
+    /**
+     * PUT/PATCH /api/candidatos/{id}
+     */
+    public function update(Request $request, $id)
     {
         $validated = $request->validate([
-            'nombre' => 'required|string',
+            'nombre' => 'required|string|max:255',
             'orden_en_lista' => 'required|integer|min:1',
             'lista_id' => 'required|exists:listas,id'
         ]);
 
-        $candidato = Candidato::findOrFail($id);
-        $candidato->update($validated);
-        return response()->json($candidato->load('lista.provincia'), 200);
+        try {
+            $candidato = $this->candidatoService->actualizarCandidato($id, $validated);
+            return response()->json($candidato, 200);
+        } catch (\InvalidArgumentException $e) {
+            return response()->json(['mensaje' => $e->getMessage()], 422);
+        } catch (\Exception $e) {
+            return response()->json(['mensaje' => 'Error al actualizar el candidato', 'error' => $e->getMessage()], 500);
+        }
     }
+
+    /**
+     * DELETE /api/candidatos/{id}
+     */
     public function destroy($id)
     {
-        $candidato = Candidato::findOrFail($id);
-        $candidato->delete();
-        return response()->json(null, 204);
+        try {
+            $resultado = $this->candidatoService->eliminarCandidato($id);
+            return response()->json($resultado, 200);
+        } catch (\Exception $e) {
+            return response()->json(['mensaje' => 'Error al eliminar el candidato', 'error' => $e->getMessage()], 400);
+        }
     }
-    
-/*public function resultados($id) 
-{
-    $candidato = Candidato::with('lista.provincia')->findOrFail($id);
-
-    $cargo = $candidato->lista->cargo ?? 'DIPUTADOS';
-
-
-
-
-$totalLista = \DB::table('telegramas')
-        ->where('provincia_id', $candidato->lista->provincia->id)
-
-        ->where('lista_id', $candidato->lista->id)
-
-        ->sum($cargo === 'DIPUTADOS' ? 'votos_diputados' : 'votos_senadores');
-
-    $totalValidos = \DB::table('telegramas')
-        ->where('provincia_id', $candidato->lista->provincia->id)
-        
-        ->sum($cargo === 'DIPUTADOS' ? 'votos_diputados' : 'votos_senadores');
-
-    $porcentaje = $totalValidos > 0 ? round(($totalLista / $totalValidos) * 100, 2) : 0;
-
-    return response()->json([
-        'candidato' => $candidato->nombre,
-        'lista' => $candidato->lista->nombre,
-        'provincia' => $candidato->lista->provincia->nombre,
-        'cargo' => $cargo,
-        'votos_lista' => $totalLista,
-        'porcentaje_en_provincia' => $porcentaje . '%'
-    ]);
-}
-    */
 }
