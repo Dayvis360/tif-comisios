@@ -15,12 +15,9 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             ProvinciaSeeder::class,
-            MesaSeeder::class,
             ListaSeeder::class,
             CandidatoSeeder::class,
-            TelegramaSeeder::class,
+            MesaSeeder::class,
         ]);
-
-    
     }
 }
