@@ -13,11 +13,14 @@ return new class extends Migration
     {
         Schema::create('listas', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre')->unique();
-            $table->string('alianza');
+            $table->string('nombre');
+            $table->string('alianza')->nullable();
             $table->string('cargo');
             $table->foreignId('provincia_id')->constrained('provincias')->cascadeOnDelete();
             $table->timestamps();
+            
+            // Clave única compuesta: nombre + cargo + provincia
+            $table->unique(['nombre', 'cargo', 'provincia_id']);
         });
     }
 
