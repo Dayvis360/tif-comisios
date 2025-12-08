@@ -13,6 +13,8 @@ class ProvinciaFactory extends Factory
     {
         return [
             'nombre' => $this->faker->unique()->state, 
+            'bancas_diputados' => $this->faker->numberBetween(1, 50),
+            'bancas_senadores' => 3,
         ];
     }
 }

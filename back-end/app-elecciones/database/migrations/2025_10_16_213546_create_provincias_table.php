@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('provincias', function (Blueprint $table) {
             $table->id();
             $table->string('nombre')->unique();
+            $table->integer('bancas_diputados')->nullable()->comment('Bancas de diputados (variable por provincia)');
+            $table->integer('bancas_senadores')->default(3)->comment('Bancas de senadores (siempre 3)');
             $table->timestamps();
         });
     }
