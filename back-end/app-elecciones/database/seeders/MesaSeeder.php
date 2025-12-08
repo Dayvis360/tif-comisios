@@ -7,11 +7,6 @@ use Illuminate\Database\Seeder;
 
 class MesaSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     * 
-     * Crea mesas electorales distribuidas en todas las provincias argentinas
-     */
     public function run(): void
     {
         $provincias = Provincia::all();

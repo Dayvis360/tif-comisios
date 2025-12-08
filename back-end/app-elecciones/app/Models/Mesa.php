@@ -6,14 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Repositories\MesaRepository;
 
-/**
- * Mesa - Modelo de dominio con lógica de negocio
- * 
- * Responsabilidad:
- * - Representar el concepto de mesa electoral
- * - Contener la lógica de negocio (validaciones, reglas)
- * - NO saber cómo se persiste el dato
- */
+//Modelo de dominio de mesa electoral con lógica de negocio
 class Mesa extends Model
 {
     use HasFactory;
@@ -25,8 +18,6 @@ class Mesa extends Model
         'electores'
     ];
 
-    // ==================== RELACIONES ====================
-
     public function provincia()
     {
         return $this->belongsTo(Provincia::class);
@@ -37,11 +28,7 @@ class Mesa extends Model
         return $this->hasMany(Telegrama::class);
     }
 
-    // ==================== MÉTODOS DE CREACIÓN ====================
-
-    /**
-     * Crear una mesa desde datos de request
-     */
+    //Crear mesa desde datos de request
     public static function crearDesdeRequest(int $provinciaId, string $circuito, string $establecimiento, int $electores): self
     {
         $mesa = new self();
@@ -53,11 +40,7 @@ class Mesa extends Model
         return $mesa;
     }
 
-    // ==================== LÓGICA DE NEGOCIO ====================
-
-    /**
-     * Actualizar datos de la mesa
-     */
+    //Actualizar datos de la mesa
     public function actualizarDatos(int $provinciaId, string $circuito, string $establecimiento, int $electores): void
     {
         $this->provincia_id = $provinciaId;
@@ -66,16 +49,7 @@ class Mesa extends Model
         $this->electores = $electores;
     }
 
-    /**
-     * Verificar que la mesa sea válida
-     * 
-     * Reglas:
-     * - La provincia debe existir
-     * - El circuito no puede estar vacío
-     * - El establecimiento no puede estar vacío
-     * - No puede existir otra mesa con mismo circuito y establecimiento en la provincia
-     * - Los electores deben ser mayor a 0
-     */
+    //Verificar que la mesa sea válida
     public function verificarQueSeaValida(MesaRepository $repository, ?int $excludeId = null): void
     {
         if (empty($this->circuito)) {
@@ -90,18 +64,12 @@ class Mesa extends Model
             throw new \InvalidArgumentException("El número de electores debe ser mayor a 0");
         }
 
-        // Verificar que no exista mesa duplicada
         if ($repository->existeMesaEnCircuito($this->provincia_id, $this->circuito, $this->establecimiento, $excludeId)) {
             throw new \InvalidArgumentException("Ya existe una mesa en el circuito {$this->circuito} del establecimiento {$this->establecimiento}");
         }
     }
 
-    /**
-     * Verificar que la mesa se pueda eliminar
-     * 
-     * Reglas:
-     * - No se puede eliminar si tiene telegramas asociados
-     */
+    //Verificar que la mesa se pueda eliminar
     public function verificarQueSeaPuedeEliminar(): void
     {
         if ($this->telegramas()->exists()) {
@@ -109,9 +77,7 @@ class Mesa extends Model
         }
     }
 
-    /**
-     * Obtener descripción completa de la mesa
-     */
+    //Obtener descripción completa de la mesa
     public function obtenerDescripcionCompleta(): string
     {
         return "Mesa {$this->circuito} - {$this->establecimiento} ({$this->electores} electores)";

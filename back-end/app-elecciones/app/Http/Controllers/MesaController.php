@@ -6,15 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\MesaService;
 
-/**
- * MesaController
- * 
- * Responsabilidad:
- * - Recibir peticiones HTTP
- * - Validar datos de entrada
- * - Llamar al Service
- * - Devolver respuestas HTTP
- */
+//Controlador HTTP de mesas
 class MesaController extends Controller
 {
     private MesaService $mesaService;
@@ -24,18 +16,14 @@ class MesaController extends Controller
         $this->mesaService = $mesaService;
     }
 
-    /**
-     * GET /api/mesas
-     */
+    //Listar todas las mesas
     public function index()
     {
         $mesas = $this->mesaService->listarMesas();
         return response()->json($mesas, 200);
     }
 
-    /**
-     * GET /api/mesas/{id}
-     */
+    //Obtener mesa por ID
     public function show($id)
     {
         $mesa = $this->mesaService->obtenerMesa($id);
@@ -47,9 +35,7 @@ class MesaController extends Controller
         return response()->json($mesa, 200);
     }
 
-    /**
-     * POST /api/mesas
-     */
+    //Crear nueva mesa
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -69,9 +55,7 @@ class MesaController extends Controller
         }
     }
 
-    /**
-     * PUT/PATCH /api/mesas/{id}
-     */
+    //Actualizar mesa
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
@@ -91,9 +75,7 @@ class MesaController extends Controller
         }
     }
 
-    /**
-     * DELETE /api/mesas/{id}
-     */
+    //Eliminar mesa
     public function destroy($id)
     {
         try {

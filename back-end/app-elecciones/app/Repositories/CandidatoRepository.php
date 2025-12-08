@@ -6,13 +6,7 @@ use App\DAO\CandidatoDAO;
 use App\Models\Candidato;
 use Illuminate\Database\Eloquent\Collection;
 
-/**
- * CandidatoRepository
- * 
- * Responsabilidad:
- * - Ofrecer métodos de acceso a datos orientados al dominio
- * - Trabajar con objetos del dominio (Modelo Candidato)
- */
+//Repositorio de acceso a datos de candidatos
 class CandidatoRepository
 {
     private CandidatoDAO $candidatoDAO;
@@ -22,9 +16,6 @@ class CandidatoRepository
         $this->candidatoDAO = $candidatoDAO;
     }
 
-    /**
-     * Obtener todos los candidatos
-     */
     public function obtenerTodos(): Collection
     {
         return Candidato::with('lista.provincia')
@@ -33,17 +24,11 @@ class CandidatoRepository
             ->get();
     }
 
-    /**
-     * Buscar candidato por ID
-     */
     public function buscarPorId(int $id): ?Candidato
     {
         return Candidato::with('lista.provincia')->find($id);
     }
 
-    /**
-     * Buscar candidatos por lista
-     */
     public function buscarPorLista(int $listaId): Collection
     {
         return Candidato::where('lista_id', $listaId)
@@ -51,9 +36,6 @@ class CandidatoRepository
             ->get();
     }
 
-    /**
-     * Guardar un nuevo candidato
-     */
     public function guardar(Candidato $candidato): void
     {
         $id = $this->candidatoDAO->insert([
@@ -65,9 +47,6 @@ class CandidatoRepository
         $candidato->id = $id;
     }
 
-    /**
-     * Actualizar un candidato existente
-     */
     public function actualizar(Candidato $candidato): bool
     {
         return $this->candidatoDAO->update($candidato->id, [
@@ -77,25 +56,16 @@ class CandidatoRepository
         ]);
     }
 
-    /**
-     * Eliminar un candidato
-     */
     public function eliminar(int $id): bool
     {
         return $this->candidatoDAO->delete($id);
     }
 
-    /**
-     * Verificar si existe orden duplicado en lista
-     */
     public function existeOrdenEnLista(int $listaId, int $orden, ?int $excludeId = null): bool
     {
         return $this->candidatoDAO->existeOrdenEnLista($listaId, $orden, $excludeId);
     }
 
-    /**
-     * Obtener el siguiente orden disponible en una lista
-     */
     public function obtenerSiguienteOrden(int $listaId): int
     {
         return $this->candidatoDAO->getMaxOrdenEnLista($listaId) + 1;

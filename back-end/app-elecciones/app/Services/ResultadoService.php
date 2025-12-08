@@ -4,14 +4,7 @@ namespace App\Services;
 
 use App\Repositories\ResultadoRepository;
 
-/**
- * ResultadoService
- * 
- * Responsabilidad:
- * - Orquestar casos de uso de resultados electorales
- * - Calcular estadísticas y agregaciones
- * - Preparar datos para presentación
- */
+//Servicio de resultados electorales y estadísticas
 class ResultadoService
 {
     private ResultadoRepository $resultadoRepository;
@@ -21,24 +14,11 @@ class ResultadoService
         $this->resultadoRepository = $resultadoRepository;
     }
 
-    /**
-     * Caso de uso: Obtener resultados nacionales completos
-     * 
-     * Incluye:
-     * - Totales por lista (diputados y senadores)
-     * - Ranking nacional
-     * - Participación electoral
-     * - Votos válidos vs inválidos
-     */
+    //Obtener resultados nacionales completos
     public function obtenerResultadosNacionales(): array
     {
-        // 1. Obtener totales por lista
         $totales = $this->resultadoRepository->obtenerTotalesNacionales();
-
-        // 2. Obtener participación
         $participacion = $this->resultadoRepository->obtenerParticipacionNacional();
-
-        // 3. Separar por cargo
         $diputados = [];
         $senadores = [];
 
@@ -60,18 +40,15 @@ class ResultadoService
             }
         }
 
-        // 4. Calcular totales generales
         $totalVotosDiputados = array_sum(array_column($diputados, 'total_votos'));
         $totalVotosSenadores = array_sum(array_column($senadores, 'total_votos'));
 
-        // 5. Calcular porcentaje de participación
         $totalElectores = (int) $participacion->total_electores;
         $totalVotosEmitidos = (int) $participacion->total_votos_emitidos;
         $porcentajeParticipacion = $totalElectores > 0 
             ? round(($totalVotosEmitidos / $totalElectores) * 100, 2) 
             : 0;
 
-        // 6. Agregar porcentajes a cada lista
         foreach ($diputados as &$lista) {
             $lista['porcentaje'] = $totalVotosDiputados > 0 
                 ? round(($lista['total_votos'] / $totalVotosDiputados) * 100, 2) 
@@ -102,25 +79,18 @@ class ResultadoService
         ];
     }
 
-    /**
-     * Caso de uso: Obtener ranking nacional por cargo
-     */
+    //Obtener ranking nacional por cargo
     public function obtenerRankingNacional(string $cargo): array
     {
-        // Validar cargo
         if (!in_array($cargo, ['DIPUTADOS', 'SENADORES'])) {
             throw new \InvalidArgumentException("Cargo inválido. Debe ser DIPUTADOS o SENADORES");
         }
 
-        // Obtener ranking
         $ranking = $this->resultadoRepository->obtenerRankingNacional($cargo);
-
-        // Formatear respuesta
         $resultado = [];
         $posicion = 1;
         $totalVotos = 0;
 
-        // Calcular total de votos
         foreach ($ranking as $lista) {
             $votos = $cargo === 'DIPUTADOS' 
                 ? (int) $lista->total_votos_diputados 
@@ -128,7 +98,6 @@ class ResultadoService
             $totalVotos += $votos;
         }
 
-        // Agregar posición y porcentaje
         foreach ($ranking as $lista) {
             $votos = $cargo === 'DIPUTADOS' 
                 ? (int) $lista->total_votos_diputados 
@@ -155,21 +124,12 @@ class ResultadoService
         ];
     }
 
-    /**
-     * Caso de uso: Obtener estadísticas de una provincia
-     */
+    //Obtener estadísticas de una provincia
     public function obtenerEstadisticasProvincia(int $provinciaId): array
     {
-        // 1. Obtener totales por lista
         $totales = $this->resultadoRepository->obtenerTotalesPorProvincia($provinciaId);
-
-        // 2. Obtener participación
         $participacion = $this->resultadoRepository->obtenerParticipacionPorProvincia($provinciaId);
-
-        // 3. Obtener votos válidos vs inválidos
         $votosValidosInvalidos = $this->resultadoRepository->obtenerVotosValidosInvalidos($provinciaId);
-
-        // 4. Separar por cargo
         $diputados = [];
         $senadores = [];
 
@@ -191,7 +151,6 @@ class ResultadoService
             }
         }
 
-        // 5. Calcular totales
         $totalElectores = (int) $participacion->total_electores;
         $totalVotosEmitidos = (int) ($participacion->total_votos_diputados + 
                                      $participacion->total_votos_senadores + 
@@ -205,7 +164,6 @@ class ResultadoService
         $votosRecurridos = (int) $votosValidosInvalidos->votos_recurridos;
         $votosInvalidos = $votosBlancos + $votosNulos + $votosRecurridos;
 
-        // 6. Calcular porcentajes
         $porcentajeParticipacion = $totalElectores > 0 
             ? round(($totalVotosEmitidos / $totalElectores) * 100, 2) 
             : 0;
@@ -243,9 +201,7 @@ class ResultadoService
         ];
     }
 
-    /**
-     * Caso de uso: Obtener resumen de todas las provincias
-     */
+    //Obtener resumen de todas las provincias
     public function obtenerResumenProvincias(): array
     {
         $provincias = $this->resultadoRepository->obtenerResumenTodasProvincias();
@@ -275,9 +231,7 @@ class ResultadoService
         return $resultado;
     }
 
-    /**
-     * Caso de uso: Exportar resultados provinciales a CSV
-     */
+    //Exportar resultados provinciales a CSV
     public function exportarResultadosProvinciaCSV(int $provinciaId): string
     {
         $estadisticas = $this->obtenerEstadisticasProvincia($provinciaId);
@@ -336,18 +290,14 @@ class ResultadoService
         return $csv;
     }
 
-    /**
-     * Caso de uso: Exportar resultados provinciales a JSON
-     */
+    //Exportar resultados provinciales a JSON
     public function exportarResultadosProvinciaJSON(int $provinciaId): string
     {
         $estadisticas = $this->obtenerEstadisticasProvincia($provinciaId);
         return json_encode($estadisticas, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     }
 
-    /**
-     * Caso de uso: Exportar resultados nacionales a CSV
-     */
+    //Exportar resultados nacionales a CSV
     public function exportarResultadosNacionalesCSV(): string
     {
         $resultados = $this->obtenerResultadosNacionales();
@@ -403,18 +353,14 @@ class ResultadoService
         return $csv;
     }
 
-    /**
-     * Caso de uso: Exportar resultados nacionales a JSON
-     */
+    //Exportar resultados nacionales a JSON
     public function exportarResultadosNacionalesJSON(): string
     {
         $resultados = $this->obtenerResultadosNacionales();
         return json_encode($resultados, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     }
 
-    /**
-     * Caso de uso: Exportar resumen de provincias a CSV
-     */
+    //Exportar resumen de provincias a CSV
     public function exportarResumenProvinciasCSV(): string
     {
         $resumen = $this->obtenerResumenProvincias();
@@ -457,9 +403,7 @@ class ResultadoService
         return $csv;
     }
 
-    /**
-     * Caso de uso: Exportar resumen de provincias a JSON
-     */
+    //Exportar resumen de provincias a JSON
     public function exportarResumenProvinciasJSON(): string
     {
         $resumen = $this->obtenerResumenProvincias();

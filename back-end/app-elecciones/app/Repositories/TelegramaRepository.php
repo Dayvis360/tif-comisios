@@ -6,13 +6,7 @@ use App\DAO\TelegramaDAO;
 use App\Models\Telegrama;
 use Illuminate\Database\Eloquent\Collection;
 
-/**
- * TelegramaRepository
- * 
- * Responsabilidad:
- * - Ofrecer métodos de acceso a datos orientados al dominio
- * - Trabajar con objetos del dominio (Modelo Telegrama)
- */
+//Repositorio de acceso a datos de telegramas
 class TelegramaRepository
 {
     private TelegramaDAO $telegramaDAO;
@@ -22,9 +16,6 @@ class TelegramaRepository
         $this->telegramaDAO = $telegramaDAO;
     }
 
-    /**
-     * Obtener todos los telegramas
-     */
     public function obtenerTodos(): Collection
     {
         return Telegrama::with(['mesa.provincia', 'lista'])
@@ -33,17 +24,11 @@ class TelegramaRepository
             ->get();
     }
 
-    /**
-     * Buscar telegrama por ID
-     */
     public function buscarPorId(int $id): ?Telegrama
     {
         return Telegrama::with(['mesa.provincia', 'lista'])->find($id);
     }
 
-    /**
-     * Buscar telegramas por mesa
-     */
     public function buscarPorMesa(int $mesaId): Collection
     {
         return Telegrama::with('lista')
@@ -51,9 +36,6 @@ class TelegramaRepository
             ->get();
     }
 
-    /**
-     * Guardar un nuevo telegrama
-     */
     public function guardar(Telegrama $telegrama): void
     {
         $id = $this->telegramaDAO->insert([
@@ -71,9 +53,6 @@ class TelegramaRepository
         $telegrama->id = $id;
     }
 
-    /**
-     * Actualizar un telegrama existente
-     */
     public function actualizar(Telegrama $telegrama): bool
     {
         return $this->telegramaDAO->update($telegrama->id, [
@@ -89,73 +68,51 @@ class TelegramaRepository
         ]);
     }
 
-    /**
-     * Eliminar un telegrama
-     */
     public function eliminar(int $id): bool
     {
         return $this->telegramaDAO->delete($id);
     }
 
-    /**
-     * Verificar si existe telegrama duplicado
-     */
     public function existeTelegramaParaMesaYLista(int $mesaId, int $listaId, ?int $excludeId = null): bool
     {
         return $this->telegramaDAO->existeTelegramaParaMesaYLista($mesaId, $listaId, $excludeId);
     }
 
-    /**
-     * Obtener total de votos de una mesa (para validaciones)
-     */
     public function obtenerTotalVotosMesa(int $mesaId): object
     {
         return $this->telegramaDAO->getTotalVotosMesa($mesaId);
     }
 
-    /**
-     * Obtener telegramas por lista (para cálculo D'Hont)
-     */
     public function obtenerPorLista(int $listaId): Collection
     {
         return Telegrama::where('lista_id', $listaId)->get();
     }
 
-    /**
-     * Guardar múltiples telegramas en lote
-     */
     public function guardarLote(array $telegramas): bool
     {
         return $this->telegramaDAO->insertBatch($telegramas);
     }
 
-    /**
-     * Obtener telegramas con filtros
-     */
     public function obtenerConFiltros(?int $provinciaId = null, ?string $cargo = null, ?int $listaId = null, ?int $mesaDesde = null, ?int $mesaHasta = null): Collection
     {
         $query = Telegrama::with(['mesa.provincia', 'lista']);
 
-        // Filtro por provincia
         if ($provinciaId !== null) {
             $query->whereHas('mesa', function($q) use ($provinciaId) {
                 $q->where('provincia_id', $provinciaId);
             });
         }
 
-        // Filtro por cargo (a través de lista)
         if ($cargo !== null) {
             $query->whereHas('lista', function($q) use ($cargo) {
                 $q->where('cargo', $cargo);
             });
         }
 
-        // Filtro por lista
         if ($listaId !== null) {
             $query->where('lista_id', $listaId);
         }
 
-        // Filtro por rango de mesas
         if ($mesaDesde !== null) {
             $query->where('mesa_id', '>=', $mesaDesde);
         }

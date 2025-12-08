@@ -6,13 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Repositories\TelegramaRepository;
 
-/**
- * Telegrama - Modelo de dominio con lógica de negocio
- * 
- * Responsabilidad:
- * - Representar el concepto de telegrama electoral
- * - Contener la lógica de negocio (validaciones de votos)
- */
+//Modelo de dominio de telegrama electoral con lógica de negocio
 class Telegrama extends Model
 {
     use HasFactory;
@@ -31,8 +25,6 @@ class Telegrama extends Model
         'fecha_modificacion'
     ];
 
-    // ==================== RELACIONES ====================
-
     public function mesa()
     {
         return $this->belongsTo(Mesa::class);
@@ -43,11 +35,7 @@ class Telegrama extends Model
         return $this->belongsTo(Lista::class);
     }
 
-    // ==================== MÉTODOS DE CREACIÓN ====================
-
-    /**
-     * Crear un telegrama desde datos de request
-     */
+    //Crear telegrama desde datos de request
     public static function crearDesdeRequest(
         int $mesaId,
         int $listaId,
@@ -72,11 +60,7 @@ class Telegrama extends Model
         return $telegrama;
     }
 
-    // ==================== LÓGICA DE NEGOCIO ====================
-
-    /**
-     * Actualizar datos del telegrama
-     */
+    //Actualizar datos del telegrama
     public function actualizarDatos(
         int $mesaId,
         int $listaId,
@@ -98,17 +82,9 @@ class Telegrama extends Model
         $this->fecha_modificacion = now();
     }
 
-    /**
-     * Verificar que el telegrama sea válido
-     * 
-     * Reglas:
-     * - Todos los votos deben ser mayores o iguales a 0
-     * - No puede existir otro telegrama para la misma mesa y lista
-     * - El total de votos no puede exceder el número de electores de la mesa (validación opcional)
-     */
+    //Verificar que el telegrama sea válido
     public function verificarQueSeaValido(TelegramaRepository $repository, ?int $excludeId = null): void
     {
-        // Validar que los votos no sean negativos
         if ($this->votos_Diputados < 0) {
             throw new \InvalidArgumentException("Los votos para diputados no pueden ser negativos");
         }
@@ -129,15 +105,12 @@ class Telegrama extends Model
             throw new \InvalidArgumentException("Los votos recurridos no pueden ser negativos");
         }
 
-        // Verificar que no exista telegrama duplicado para mesa y lista
         if ($repository->existeTelegramaParaMesaYLista($this->mesa_id, $this->lista_id, $excludeId)) {
             throw new \InvalidArgumentException("Ya existe un telegrama para esta mesa y lista");
         }
     }
 
-    /**
-     * Calcular total de votos del telegrama
-     */
+    //Calcular total de votos del telegrama
     public function calcularTotalVotos(): int
     {
         return $this->votos_Diputados + 
@@ -147,23 +120,17 @@ class Telegrama extends Model
                $this->voto_Recurridos;
     }
 
-    /**
-     * Verificar si el telegrama tiene votos válidos (no solo blancos/nulos/recurridos)
-     */
+    //Verificar si el telegrama tiene votos válidos
     public function tieneVotosValidos(): bool
     {
         return $this->votos_Diputados > 0 || $this->votos_Senadores > 0;
     }
 
-    /**
-     * Validar estructura de datos para importación
-     * Verifica que tenga todos los campos obligatorios
-     */
+    //Validar estructura de datos para importación
     public static function validarEstructuraImportacion(array $dato): array
     {
         $errores = [];
 
-        // Campos obligatorios
         if (!isset($dato['mesa_id'])) {
             $errores[] = 'Falta el campo mesa_id';
         }
@@ -192,7 +159,6 @@ class Telegrama extends Model
             $errores[] = 'Falta el campo voto_Recurridos';
         }
 
-        // Validar que sean números
         if (isset($dato['mesa_id']) && !is_numeric($dato['mesa_id'])) {
             $errores[] = 'El campo mesa_id debe ser numérico';
         }
@@ -221,7 +187,6 @@ class Telegrama extends Model
             $errores[] = 'El campo voto_Recurridos debe ser numérico';
         }
 
-        // Validar que sean positivos
         if (isset($dato['votos_Diputados']) && $dato['votos_Diputados'] < 0) {
             $errores[] = 'Los votos_Diputados no pueden ser negativos';
         }

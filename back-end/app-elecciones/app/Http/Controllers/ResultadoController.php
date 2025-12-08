@@ -5,15 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\ResultadoService;
 use Illuminate\Http\Request;
 
-/**
- * ResultadoController
- * 
- * Responsabilidad:
- * - Recibir peticiones HTTP para resultados electorales
- * - Validar parámetros
- * - Llamar al Service
- * - Devolver respuestas JSON
- */
+//Controlador HTTP de resultados electorales
 class ResultadoController extends Controller
 {
     private ResultadoService $resultadoService;
@@ -23,14 +15,7 @@ class ResultadoController extends Controller
         $this->resultadoService = $resultadoService;
     }
 
-    /**
-     * GET /api/resultados/nacional
-     * 
-     * Obtener resultados nacionales completos:
-     * - Participación electoral
-     * - Totales por lista (diputados y senadores)
-     * - Porcentajes
-     */
+    //Obtener resultados nacionales completos
     public function nacional()
     {
         try {
@@ -44,11 +29,7 @@ class ResultadoController extends Controller
         }
     }
 
-    /**
-     * GET /api/resultados/ranking/{cargo}
-     * 
-     * Obtener ranking nacional por cargo (DIPUTADOS o SENADORES)
-     */
+    //Obtener ranking nacional por cargo
     public function ranking(string $cargo)
     {
         try {
@@ -67,14 +48,7 @@ class ResultadoController extends Controller
         }
     }
 
-    /**
-     * GET /api/resultados/provincia/{id}/estadisticas
-     * 
-     * Obtener estadísticas completas de una provincia:
-     * - Participación
-     * - Votos válidos vs inválidos
-     * - Totales por lista
-     */
+    //Obtener estadísticas completas de una provincia
     public function estadisticasProvincia(int $id)
     {
         try {
@@ -88,11 +62,7 @@ class ResultadoController extends Controller
         }
     }
 
-    /**
-     * GET /api/resultados/provincias
-     * 
-     * Obtener resumen de todas las provincias
-     */
+    //Obtener resumen de todas las provincias
     public function resumenProvincias()
     {
         try {
@@ -106,16 +76,10 @@ class ResultadoController extends Controller
         }
     }
 
-    /**
-     * GET /api/resultados/provincia/{id}/exportar?formato=csv
-     * GET /api/resultados/provincia/{id}/exportar?formato=json
-     * 
-     * Exportar resultados de una provincia en CSV o JSON
-     */
+    //Exportar resultados de una provincia en CSV o JSON
     public function exportarProvincia(int $id, Request $request)
     {
         try {
-            // Validar formato
             $validated = $request->validate([
                 'formato' => 'required|string|in:csv,json'
             ]);
@@ -144,16 +108,10 @@ class ResultadoController extends Controller
         }
     }
 
-    /**
-     * GET /api/resultados/nacional/exportar?formato=csv
-     * GET /api/resultados/nacional/exportar?formato=json
-     * 
-     * Exportar resultados nacionales en CSV o JSON
-     */
+    //Exportar resultados nacionales en CSV o JSON
     public function exportarNacional(Request $request)
     {
         try {
-            // Validar formato
             $validated = $request->validate([
                 'formato' => 'required|string|in:csv,json'
             ]);
@@ -182,16 +140,10 @@ class ResultadoController extends Controller
         }
     }
 
-    /**
-     * GET /api/resultados/provincias/exportar?formato=csv
-     * GET /api/resultados/provincias/exportar?formato=json
-     * 
-     * Exportar resumen de todas las provincias en CSV o JSON
-     */
+    //Exportar resumen de todas las provincias en CSV o JSON
     public function exportarResumenProvincias(Request $request)
     {
         try {
-            // Validar formato
             $validated = $request->validate([
                 'formato' => 'required|string|in:csv,json'
             ]);

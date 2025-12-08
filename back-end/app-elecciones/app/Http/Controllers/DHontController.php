@@ -6,15 +6,7 @@ use App\Services\DHontService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-/**
- * DHontController - Controlador para cálculo de reparto de bancas
- * 
- * Responsabilidad:
- * - Manejar peticiones HTTP relacionadas con el método D'Hont
- * - Validar parámetros de entrada
- * - Delegar cálculo al DHontService
- * - Retornar respuestas JSON
- */
+//Controlador HTTP para cálculo de reparto de bancas con método D'Hont
 class DHontController extends Controller
 {
     private DHontService $dhontService;
@@ -24,22 +16,11 @@ class DHontController extends Controller
         $this->dhontService = $dhontService;
     }
 
-    /**
-     * Calcular reparto de bancas para una provincia específica
-     * 
-     * GET /api/dhont/provincia/{provinciaId}?cargo=DIPUTADOS
-     * 
-     * @param int $provinciaId
-     * @param Request $request
-     * @return JsonResponse
-     */
+    //Calcular reparto de bancas para una provincia
     public function calcularPorProvincia(int $provinciaId, Request $request): JsonResponse
     {
         try {
-            // Obtener cargo del query string (por defecto DIPUTADOS)
             $cargo = $request->query('cargo', 'DIPUTADOS');
-
-            // Calcular reparto
             $resultado = $this->dhontService->calcularRepartoBancas($provinciaId, $cargo);
 
             return response()->json([
@@ -61,21 +42,11 @@ class DHontController extends Controller
         }
     }
 
-    /**
-     * Calcular reparto de bancas para todas las provincias
-     * 
-     * GET /api/dhont/todas?cargo=DIPUTADOS
-     * 
-     * @param Request $request
-     * @return JsonResponse
-     */
+    //Calcular reparto de bancas para todas las provincias
     public function calcularTodasProvincias(Request $request): JsonResponse
     {
         try {
-            // Obtener cargo del query string (por defecto DIPUTADOS)
             $cargo = $request->query('cargo', 'DIPUTADOS');
-
-            // Calcular reparto para todas las provincias
             $resultado = $this->dhontService->calcularRepartoTodasProvincias($cargo);
 
             return response()->json([
@@ -97,17 +68,10 @@ class DHontController extends Controller
         }
     }
 
-    /**
-     * Obtener resumen de resultados electorales
-     * 
-     * GET /api/dhont/resumen
-     * 
-     * @return JsonResponse
-     */
+    //Obtener resumen de resultados electorales para diputados y senadores
     public function obtenerResumen(): JsonResponse
     {
         try {
-            // Calcular para diputados y senadores
             $diputados = $this->dhontService->calcularRepartoTodasProvincias('DIPUTADOS');
             $senadores = $this->dhontService->calcularRepartoTodasProvincias('SENADORES');
 

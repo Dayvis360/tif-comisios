@@ -2,106 +2,76 @@
 
 namespace App\DAO;
 
-use Illuminate\Support\Facades\DB;
+use App\Models\Candidato;
 
-/**
- * CandidatoDAO
- * 
- * Responsabilidad:
- * - Encapsular las consultas concretas a la base de datos
- * - Usar Query Builder o SQL directo
- * - Conocer nombres de tablas y columnas
- */
 class CandidatoDAO
 {
-    /**
-     * Obtener todos los candidatos
-     */
+    //Obtener todos los candidatos
     public function getAll(): array
     {
-        return DB::table('candidatos')
-            ->join('listas', 'candidatos.lista_id', '=', 'listas.id')
-            ->join('provincias', 'listas.provincia_id', '=', 'provincias.id')
-            ->select(
-                'candidatos.*',
-                'listas.nombre as lista_nombre',
-                'listas.cargo as lista_cargo',
-                'provincias.nombre as provincia_nombre'
-            )
-            ->orderBy('candidatos.lista_id', 'asc')
-            ->orderBy('candidatos.orden_en_lista', 'asc')
+        return Candidato::with(['lista.provincia'])
+            ->orderBy('lista_id', 'asc')
+            ->orderBy('orden_en_lista', 'asc')
             ->get()
+            ->map(function($candidato) {
+                $array = $candidato->toArray();
+                $array['lista_nombre'] = $candidato->lista->nombre ?? null;
+                $array['lista_cargo'] = $candidato->lista->cargo ?? null;
+                $array['provincia_nombre'] = $candidato->lista->provincia->nombre ?? null;
+                return $array;
+            })
             ->toArray();
     }
 
-    /**
-     * Buscar candidato por ID
-     */
+    //Buscar candidato por ID
     public function findById(int $id): ?object
     {
-        return DB::table('candidatos')
-            ->where('id', $id)
-            ->first();
+        $candidato = Candidato::find($id);
+        return $candidato ? (object)$candidato->toArray() : null;
     }
 
-    /**
-     * Buscar candidatos por lista
-     */
+    //Buscar candidatos por lista
     public function findByLista(int $listaId): array
     {
-        return DB::table('candidatos')
-            ->where('lista_id', $listaId)
+        return Candidato::where('lista_id', $listaId)
             ->orderBy('orden_en_lista', 'asc')
             ->get()
             ->toArray();
     }
 
-    /**
-     * Insertar un nuevo candidato
-     */
+    //Insertar nuevo candidato
     public function insert(array $data): int
     {
-        return DB::table('candidatos')->insertGetId([
+        $candidato = Candidato::create([
             'nombre' => $data['nombre'],
             'orden_en_lista' => $data['orden_en_lista'],
             'lista_id' => $data['lista_id'],
-            'created_at' => now(),
-            'updated_at' => now(),
         ]);
+        
+        return $candidato->id;
     }
 
-    /**
-     * Actualizar un candidato existente
-     */
+    //Actualizar candidato
     public function update(int $id, array $data): bool
     {
-        return DB::table('candidatos')
-            ->where('id', $id)
+        return Candidato::where('id', $id)
             ->update([
                 'nombre' => $data['nombre'],
                 'orden_en_lista' => $data['orden_en_lista'],
                 'lista_id' => $data['lista_id'],
-                'updated_at' => now(),
             ]);
     }
 
-    /**
-     * Eliminar un candidato
-     */
+    //Eliminar candidato
     public function delete(int $id): bool
     {
-        return DB::table('candidatos')
-            ->where('id', $id)
-            ->delete();
+        return Candidato::destroy($id) > 0;
     }
 
-    /**
-     * Verificar si existe un candidato con el mismo orden en una lista
-     */
+    //Verificar si existe orden en lista
     public function existeOrdenEnLista(int $listaId, int $orden, ?int $excludeId = null): bool
     {
-        $query = DB::table('candidatos')
-            ->where('lista_id', $listaId)
+        $query = Candidato::where('lista_id', $listaId)
             ->where('orden_en_lista', $orden);
 
         if ($excludeId !== null) {
@@ -111,31 +81,22 @@ class CandidatoDAO
         return $query->exists();
     }
 
-    /**
-     * Obtener el máximo orden en una lista
-     */
+    //Obtener máximo orden en lista
     public function getMaxOrdenEnLista(int $listaId): int
     {
-        return DB::table('candidatos')
-            ->where('lista_id', $listaId)
+        return Candidato::where('lista_id', $listaId)
             ->max('orden_en_lista') ?? 0;
     }
 
-    /**
-     * Contar candidatos
-     */
+    //Contar candidatos
     public function count(): int
     {
-        return DB::table('candidatos')->count();
+        return Candidato::count();
     }
 
-    /**
-     * Contar candidatos por lista
-     */
+    //Contar candidatos por lista
     public function countByLista(int $listaId): int
     {
-        return DB::table('candidatos')
-            ->where('lista_id', $listaId)
-            ->count();
+        return Candidato::where('lista_id', $listaId)->count();
     }
 }

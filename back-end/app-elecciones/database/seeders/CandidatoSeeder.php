@@ -9,14 +9,8 @@ use Illuminate\Database\Seeder;
 
 class CandidatoSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     * 
-     * Crea candidatos para las listas de Buenos Aires como ejemplo
-     */
     public function run(): void
     {
-        // Solo crear candidatos para Buenos Aires como ejemplo
         $buenosAires = Provincia::where('nombre', 'Buenos Aires')->first();
         
         if (!$buenosAires) {

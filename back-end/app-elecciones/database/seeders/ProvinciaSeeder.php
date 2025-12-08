@@ -7,11 +7,6 @@ use Illuminate\Database\Seeder;
 
 class ProvinciaSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     * 
-     * Crea provincias argentinas con número de bancas para diputados y senadores
-     */
     public function run(): void
     {
         $provincias = [

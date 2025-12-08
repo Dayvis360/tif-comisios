@@ -2,96 +2,65 @@
 
 namespace App\DAO;
 
-use Illuminate\Support\Facades\DB;
+use App\Models\Provincia;
 
-/**
- * ProvinciaDAO
- * 
- * Responsabilidad:
- * - Encapsular las consultas concretas a la base de datos
- * - Usar Query Builder o SQL directo
- * - Conocer nombres de tablas y columnas
- * - NO contiene lógica de negocio
- */
 class ProvinciaDAO
 {
-    /**
-     * Obtener todas las provincias
-     */
+    //Obtener todas las provincias
     public function getAll(): array
     {
-        return DB::table('provincias')
-            ->orderBy('nombre', 'asc')
+        return Provincia::orderBy('nombre', 'asc')
             ->get()
             ->toArray();
     }
 
-    /**
-     * Buscar provincia por ID
-     */
+    //Buscar provincia por ID
     public function findById(int $id): ?object
     {
-        return DB::table('provincias')
-            ->where('id', $id)
-            ->first();
+        $provincia = Provincia::find($id);
+        return $provincia ? (object)$provincia->toArray() : null;
     }
 
-    /**
-     * Buscar provincia por nombre
-     */
+    //Buscar provincia por nombre
     public function findByNombre(string $nombre): ?object
     {
-        return DB::table('provincias')
-            ->where('nombre', $nombre)
-            ->first();
+        $provincia = Provincia::where('nombre', $nombre)->first();
+        return $provincia ? (object)$provincia->toArray() : null;
     }
 
-    /**
-     * Insertar una nueva provincia
-     */
+    //Insertar nueva provincia
     public function insert(array $data): int
     {
-        return DB::table('provincias')->insertGetId([
+        $provincia = Provincia::create([
             'nombre' => $data['nombre'],
             'bancas_diputados' => $data['bancas_diputados'] ?? null,
             'bancas_senadores' => $data['bancas_senadores'] ?? 3,
-            'created_at' => now(),
-            'updated_at' => now(),
         ]);
+        
+        return $provincia->id;
     }
 
-    /**
-     * Actualizar una provincia existente
-     */
+    //Actualizar provincia
     public function update(int $id, array $data): bool
     {
-        return DB::table('provincias')
-            ->where('id', $id)
+        return Provincia::where('id', $id)
             ->update([
                 'nombre' => $data['nombre'],
                 'bancas_diputados' => $data['bancas_diputados'] ?? null,
                 'bancas_senadores' => $data['bancas_senadores'] ?? 3,
-                'updated_at' => now(),
             ]);
     }
 
-    /**
-     * Eliminar una provincia
-     */
+    //Eliminar provincia
     public function delete(int $id): bool
     {
-        return DB::table('provincias')
-            ->where('id', $id)
-            ->delete();
+        return Provincia::destroy($id) > 0;
     }
 
-    /**
-     * Verificar si existe una provincia con el nombre dado (excluyendo un ID específico)
-     */
+    //Verificar si existe nombre de provincia
     public function existeNombre(string $nombre, ?int $excludeId = null): bool
     {
-        $query = DB::table('provincias')
-            ->where('nombre', $nombre);
+        $query = Provincia::where('nombre', $nombre);
 
         if ($excludeId !== null) {
             $query->where('id', '!=', $excludeId);
@@ -100,11 +69,9 @@ class ProvinciaDAO
         return $query->exists();
     }
 
-    /**
-     * Contar provincias
-     */
+    //Contar provincias
     public function count(): int
     {
-        return DB::table('provincias')->count();
+        return Provincia::count();
     }
 }

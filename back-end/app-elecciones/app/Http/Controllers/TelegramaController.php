@@ -6,15 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\TelegramaService;
 
-/**
- * TelegramaController
- * 
- * Responsabilidad:
- * - Recibir peticiones HTTP
- * - Validar datos de entrada
- * - Llamar al Service
- * - Devolver respuestas HTTP
- */
+//Controlador HTTP de telegramas
 class TelegramaController extends Controller
 {
     private TelegramaService $telegramaService;
@@ -24,19 +16,14 @@ class TelegramaController extends Controller
         $this->telegramaService = $telegramaService;
     }
 
-    /**
-     * GET /api/telegramas
-     * Permite filtrar por: provincia_id, cargo, lista_id, mesa_desde, mesa_hasta
-     */
+    //Listar telegramas con filtros opcionales
     public function index(Request $request)
     {
-        // Si no hay filtros, devolver todos
         if (!$request->hasAny(['provincia_id', 'cargo', 'lista_id', 'mesa_desde', 'mesa_hasta'])) {
             $telegramas = $this->telegramaService->listarTelegramas();
             return response()->json($telegramas, 200);
         }
 
-        // Validar filtros
         $validated = $request->validate([
             'provincia_id' => 'nullable|integer|exists:provincias,id',
             'cargo' => 'nullable|string|in:DIPUTADOS,SENADORES',
@@ -45,7 +32,6 @@ class TelegramaController extends Controller
             'mesa_hasta' => 'nullable|integer|exists:mesas,id'
         ]);
 
-        // Listar con filtros
         $telegramas = $this->telegramaService->listarTelegramasConFiltros(
             $validated['provincia_id'] ?? null,
             $validated['cargo'] ?? null,
@@ -57,9 +43,7 @@ class TelegramaController extends Controller
         return response()->json($telegramas, 200);
     }
 
-    /**
-     * GET /api/telegramas/{id}
-     */
+    //Obtener telegrama por ID
     public function show(Request $request, $id)
     {
         $telegrama = $this->telegramaService->obtenerTelegrama($id);
@@ -71,9 +55,7 @@ class TelegramaController extends Controller
         return response()->json($telegrama, 200);
     }
 
-    /**
-     * POST /api/telegramas
-     */
+    //Crear nuevo telegrama
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -97,9 +79,7 @@ class TelegramaController extends Controller
         }
     }
 
-    /**
-     * PUT/PATCH /api/telegramas/{id}
-     */
+    //Actualizar telegrama
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
@@ -123,9 +103,7 @@ class TelegramaController extends Controller
         }
     }
 
-    /**
-     * DELETE /api/telegramas/{id}
-     */
+    //Eliminar telegrama
     public function destroy($id)
     {
         try {
@@ -136,13 +114,9 @@ class TelegramaController extends Controller
         }
     }
 
-    /**
-     * POST /api/telegramas/importar
-     * Body: archivo CSV o JSON con telegramas
-     */
+    //Importar telegramas desde archivo CSV o JSON
     public function importar(Request $request)
     {
-        // Validar que se envíe un archivo o datos JSON
         $validated = $request->validate([
             'archivo' => 'nullable|file|mimes:csv,txt,json|max:10240', // 10MB max
             'datos' => 'nullable|array',
@@ -159,7 +133,6 @@ class TelegramaController extends Controller
             $datos = [];
             $formato = 'json';
 
-            // Caso 1: Archivo CSV
             if ($request->hasFile('archivo')) {
                 $archivo = $request->file('archivo');
                 $extension = $archivo->getClientOriginalExtension();
@@ -180,7 +153,6 @@ class TelegramaController extends Controller
                     }
                 }
             }
-            // Caso 2: Datos JSON en el body
             elseif (isset($validated['datos'])) {
                 $datos = $validated['datos'];
                 $formato = 'json';
@@ -191,7 +163,6 @@ class TelegramaController extends Controller
                 ], 422);
             }
 
-            // Procesar importación
             $resultado = $this->telegramaService->importarTelegramas($datos, $formato);
 
             $statusCode = $resultado['exito'] ? 201 : 422;
@@ -205,26 +176,21 @@ class TelegramaController extends Controller
         }
     }
 
-    /**
-     * Parsear archivo CSV a array de telegramas
-     */
+    //Parsear archivo CSV a array de telegramas
     private function parsearCSV(string $rutaArchivo): array
     {
         $datos = [];
         $handle = fopen($rutaArchivo, 'r');
 
-        // Leer encabezados
         $encabezados = fgetcsv($handle, 1000, ',');
 
-        // Normalizar encabezados (quitar espacios, minúsculas)
         $encabezados = array_map(function($header) {
             return trim($header);
         }, $encabezados);
 
-        // Leer filas
         while (($fila = fgetcsv($handle, 1000, ',')) !== false) {
             if (count($fila) !== count($encabezados)) {
-                continue; // Saltar filas incompletas
+                continue;
             }
 
             $dato = array_combine($encabezados, $fila);

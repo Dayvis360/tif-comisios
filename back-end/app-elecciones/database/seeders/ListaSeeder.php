@@ -7,11 +7,6 @@ use Illuminate\Database\Seeder;
 
 class ListaSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     * 
-     * Crea listas de partidos políticos para cada provincia argentina
-     */
     public function run(): void
     {
         $provincias = Provincia::all();
@@ -28,14 +23,12 @@ class ListaSeeder extends Seeder
 
         foreach ($provincias as $provincia) {
             foreach ($partidosNacionales as $partido) {
-                // Lista para DIPUTADOS
                 Lista::create([
                     'nombre' => $partido,
                     'cargo' => 'DIPUTADOS',
                     'provincia_id' => $provincia->id,
                 ]);
                 
-                // Lista para SENADORES
                 Lista::create([
                     'nombre' => $partido,
                     'cargo' => 'SENADORES',

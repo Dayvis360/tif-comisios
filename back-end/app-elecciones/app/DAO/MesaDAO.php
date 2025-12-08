@@ -2,102 +2,75 @@
 
 namespace App\DAO;
 
-use Illuminate\Support\Facades\DB;
+use App\Models\Mesa;
 
-/**
- * MesaDAO
- * 
- * Responsabilidad:
- * - Encapsular las consultas concretas a la base de datos
- * - Usar Query Builder o SQL directo
- * - Conocer nombres de tablas y columnas
- * - NO contiene lógica de negocio
- */
 class MesaDAO
 {
-    /**
-     * Obtener todas las mesas con información de provincia
-     */
+    //Obtener todas las mesas con provincia
     public function getAll(): array
     {
-        return DB::table('mesas')
-            ->join('provincias', 'mesas.provincia_id', '=', 'provincias.id')
-            ->select('mesas.*', 'provincias.nombre as provincia_nombre')
-            ->orderBy('mesas.provincia_id', 'asc')
-            ->orderBy('mesas.circuito', 'asc')
+        return Mesa::with('provincia')
+            ->orderBy('provincia_id', 'asc')
+            ->orderBy('circuito', 'asc')
             ->get()
+            ->map(function($mesa) {
+                $array = $mesa->toArray();
+                $array['provincia_nombre'] = $mesa->provincia->nombre ?? null;
+                return $array;
+            })
             ->toArray();
     }
 
-    /**
-     * Buscar mesa por ID
-     */
+    //Buscar mesa por ID
     public function findById(int $id): ?object
     {
-        return DB::table('mesas')
-            ->where('id', $id)
-            ->first();
+        $mesa = Mesa::find($id);
+        return $mesa ? (object)$mesa->toArray() : null;
     }
 
-    /**
-     * Buscar mesas por provincia
-     */
+    //Buscar mesas por provincia
     public function findByProvincia(int $provinciaId): array
     {
-        return DB::table('mesas')
-            ->where('provincia_id', $provinciaId)
+        return Mesa::where('provincia_id', $provinciaId)
             ->get()
             ->toArray();
     }
 
-    /**
-     * Insertar una nueva mesa
-     */
+    //Insertar nueva mesa
     public function insert(array $data): int
     {
-        return DB::table('mesas')->insertGetId([
+        $mesa = Mesa::create([
             'provincia_id' => $data['provincia_id'],
             'circuito' => $data['circuito'],
             'establecimiento' => $data['establecimiento'],
             'electores' => $data['electores'],
-            'created_at' => now(),
-            'updated_at' => now(),
         ]);
+        
+        return $mesa->id;
     }
 
-    /**
-     * Actualizar una mesa existente
-     */
+    //Actualizar mesa
     public function update(int $id, array $data): bool
     {
-        return DB::table('mesas')
-            ->where('id', $id)
+        return Mesa::where('id', $id)
             ->update([
                 'provincia_id' => $data['provincia_id'],
                 'circuito' => $data['circuito'],
                 'establecimiento' => $data['establecimiento'],
                 'electores' => $data['electores'],
-                'updated_at' => now(),
             ]);
     }
 
-    /**
-     * Eliminar una mesa
-     */
+    //Eliminar mesa
     public function delete(int $id): bool
     {
-        return DB::table('mesas')
-            ->where('id', $id)
-            ->delete();
+        return Mesa::destroy($id) > 0;
     }
 
-    /**
-     * Verificar si existe una mesa con el mismo circuito y establecimiento en una provincia
-     */
+    //Verificar si existe mesa en circuito
     public function existeMesaEnCircuito(int $provinciaId, string $circuito, string $establecimiento, ?int $excludeId = null): bool
     {
-        $query = DB::table('mesas')
-            ->where('provincia_id', $provinciaId)
+        $query = Mesa::where('provincia_id', $provinciaId)
             ->where('circuito', $circuito)
             ->where('establecimiento', $establecimiento);
 
@@ -108,21 +81,15 @@ class MesaDAO
         return $query->exists();
     }
 
-    /**
-     * Contar mesas
-     */
+    //Contar mesas
     public function count(): int
     {
-        return DB::table('mesas')->count();
+        return Mesa::count();
     }
 
-    /**
-     * Contar mesas por provincia
-     */
+    //Contar mesas por provincia
     public function countByProvincia(int $provinciaId): int
     {
-        return DB::table('mesas')
-            ->where('provincia_id', $provinciaId)
-            ->count();
+        return Mesa::where('provincia_id', $provinciaId)->count();
     }
 }

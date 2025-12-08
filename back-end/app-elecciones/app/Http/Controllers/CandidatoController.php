@@ -6,15 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\CandidatoService;
 
-/**
- * CandidatoController
- * 
- * Responsabilidad:
- * - Recibir peticiones HTTP
- * - Validar datos de entrada
- * - Llamar al Service
- * - Devolver respuestas HTTP
- */
+//Controlador HTTP de candidatos
 class CandidatoController extends Controller
 {   
     private CandidatoService $candidatoService;
@@ -24,18 +16,14 @@ class CandidatoController extends Controller
         $this->candidatoService = $candidatoService;
     }
 
-    /**
-     * GET /api/candidatos
-     */
+    //Listar todos los candidatos
     public function index()
     {
         $candidatos = $this->candidatoService->listarCandidatos();
         return response()->json($candidatos, 200);
     }
 
-    /**
-     * GET /api/candidatos/{id}
-     */
+    //Obtener candidato por ID
     public function show(Request $request, $id)
     {
         $candidato = $this->candidatoService->obtenerCandidato($id);
@@ -47,9 +35,7 @@ class CandidatoController extends Controller
         return response()->json($candidato, 200);
     }
 
-    /**
-     * POST /api/candidatos
-     */
+    //Crear nuevo candidato
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -68,9 +54,7 @@ class CandidatoController extends Controller
         }
     }
 
-    /**
-     * PUT/PATCH /api/candidatos/{id}
-     */
+    //Actualizar candidato
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
@@ -89,9 +73,7 @@ class CandidatoController extends Controller
         }
     }
 
-    /**
-     * DELETE /api/candidatos/{id}
-     */
+    //Eliminar candidato
     public function destroy($id)
     {
         try {

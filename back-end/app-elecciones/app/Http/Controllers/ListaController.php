@@ -6,15 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\ListaService;
 
-/**
- * ListaController
- * 
- * Responsabilidad:
- * - Recibir peticiones HTTP
- * - Validar datos de entrada
- * - Llamar al Service
- * - Devolver respuestas HTTP
- */
+//Controlador HTTP de listas
 class ListaController extends Controller
 {
     private ListaService $listaService;
@@ -24,18 +16,14 @@ class ListaController extends Controller
         $this->listaService = $listaService;
     }
 
-    /**
-     * GET /api/listas
-     */
+    //Listar todas las listas
     public function index()
     {
         $listas = $this->listaService->listarListas();
         return response()->json($listas, 200);
     }
 
-    /**
-     * GET /api/listas/{id}
-     */
+    //Obtener lista por ID
     public function show(Request $request, $id)
     {
         $lista = $this->listaService->obtenerLista($id);
@@ -47,9 +35,7 @@ class ListaController extends Controller
         return response()->json($lista, 200);
     }
 
-    /**
-     * POST /api/listas
-     */
+    //Crear nueva lista
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -69,9 +55,7 @@ class ListaController extends Controller
         }
     }
 
-    /**
-     * PUT/PATCH /api/listas/{id}
-     */
+    //Actualizar lista
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
@@ -91,9 +75,7 @@ class ListaController extends Controller
         }
     }
 
-    /**
-     * DELETE /api/listas/{id}
-     */
+    //Eliminar lista
     public function destroy($id)
     {
         try {

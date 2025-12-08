@@ -6,13 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Repositories\ListaRepository;
 
-/**
- * Lista - Modelo de dominio con lógica de negocio
- * 
- * Responsabilidad:
- * - Representar el concepto de lista electoral
- * - Contener la lógica de negocio
- */
+//Modelo de dominio de lista electoral con lógica de negocio
 class Lista extends Model
 {
     use HasFactory;
@@ -23,8 +17,6 @@ class Lista extends Model
         'cargo',
         'provincia_id',
     ];
-
-    // ==================== RELACIONES ====================
 
     public function provincia()
     {
@@ -41,11 +33,7 @@ class Lista extends Model
         return $this->hasMany(Telegrama::class);
     }
 
-    // ==================== MÉTODOS DE CREACIÓN ====================
-
-    /**
-     * Crear una lista desde datos de request
-     */
+    //Crear lista desde datos de request
     public static function crearDesdeRequest(string $nombre, string $cargo, int $provinciaId, ?string $alianza = null): self
     {
         $lista = new self();
@@ -57,11 +45,7 @@ class Lista extends Model
         return $lista;
     }
 
-    // ==================== LÓGICA DE NEGOCIO ====================
-
-    /**
-     * Actualizar datos de la lista
-     */
+    //Actualizar datos de la lista
     public function actualizarDatos(string $nombre, string $cargo, int $provinciaId, ?string $alianza = null): void
     {
         $this->nombre = trim($nombre);
@@ -70,39 +54,24 @@ class Lista extends Model
         $this->alianza = $alianza ? trim($alianza) : null;
     }
 
-    /**
-     * Verificar que la lista sea válida
-     * 
-     * Reglas:
-     * - El nombre no puede estar vacío
-     * - El cargo debe ser válido (DIPUTADOS o SENADORES)
-     * - No puede existir otra lista con mismo nombre, provincia y cargo
-     */
+    //Verificar que la lista sea válida
     public function verificarQueSeaValida(ListaRepository $repository, ?int $excludeId = null): void
     {
         if (empty($this->nombre)) {
             throw new \InvalidArgumentException("El nombre de la lista no puede estar vacío");
         }
 
-        // Validar cargo
         $cargosValidos = ['DIPUTADOS', 'SENADORES'];
         if (!in_array($this->cargo, $cargosValidos)) {
             throw new \InvalidArgumentException("El cargo debe ser DIPUTADOS o SENADORES");
         }
 
-        // Verificar unicidad
         if ($repository->existeListaEnProvincia($this->nombre, $this->provincia_id, $this->cargo, $excludeId)) {
             throw new \InvalidArgumentException("Ya existe una lista '{$this->nombre}' para {$this->cargo} en esta provincia");
         }
     }
 
-    /**
-     * Verificar que la lista se pueda eliminar
-     * 
-     * Reglas:
-     * - No se puede eliminar si tiene candidatos
-     * - No se puede eliminar si tiene telegramas
-     */
+    //Verificar que la lista se pueda eliminar
     public function verificarQueSeaPuedeEliminar(): void
     {
         if ($this->candidatos()->exists()) {
@@ -114,9 +83,7 @@ class Lista extends Model
         }
     }
 
-    /**
-     * Obtener descripción completa
-     */
+    //Obtener descripción completa
     public function obtenerDescripcionCompleta(): string
     {
         $descripcion = $this->nombre;
@@ -130,14 +97,7 @@ class Lista extends Model
         return $descripcion;
     }
 
-    // ==================== LÓGICA DE NEGOCIO - MÉTODO D'HONT ====================
-
-    /**
-     * Calcular votos totales de esta lista para un cargo específico
-     * 
-     * Regla de negocio: Los votos se suman de todos los telegramas asociados
-     * según el cargo (DIPUTADOS o SENADORES)
-     */
+    //Calcular votos totales de esta lista para un cargo específico
     public function calcularVotosTotales(): int
     {
         $votosTotal = 0;
@@ -153,25 +113,13 @@ class Lista extends Model
         return $votosTotal;
     }
 
-    /**
-     * Verificar si la lista tiene suficientes votos para competir
-     * 
-     * Regla de negocio: Una lista debe tener al menos 1 voto para participar
-     * en la distribución de bancas
-     */
+    //Verificar si la lista tiene suficientes votos para competir
     public function tieneVotosParaComputar(): bool
     {
         return $this->calcularVotosTotales() > 0;
     }
 
-    /**
-     * Calcular el cociente D'Hont para esta lista
-     * 
-     * Fórmula D'Hont: Votos / (Bancas_asignadas + 1)
-     * 
-     * @param int $bancasYaAsignadas Número de bancas que ya tiene esta lista
-     * @return float Cociente D'Hont
-     */
+    //Calcular el cociente D'Hont para esta lista (Votos / (Bancas_asignadas + 1))
     public function calcularCocienteDHont(int $bancasYaAsignadas): float
     {
         $votos = $this->calcularVotosTotales();
@@ -180,17 +128,7 @@ class Lista extends Model
         return $votos / $divisor;
     }
 
-    /**
-     * Obtener candidatos electos según las bancas ganadas
-     * 
-     * LÓGICA DE NEGOCIO:
-     * - Los candidatos se eligen según su orden en la lista
-     * - Si la lista ganó 3 bancas, se eligen los primeros 3 candidatos
-     * - Ordenados por orden_en_lista ASC
-     * 
-     * @param int $bancasGanadas Número de bancas que ganó esta lista
-     * @return Collection Candidatos electos
-     */
+    //Obtener candidatos electos según las bancas ganadas
     public function obtenerCandidatosElectos(int $bancasGanadas): \Illuminate\Database\Eloquent\Collection
     {
         if ($bancasGanadas <= 0) {
@@ -203,15 +141,7 @@ class Lista extends Model
             ->get();
     }
 
-    /**
-     * Verificar si la lista tiene suficientes candidatos para las bancas ganadas
-     * 
-     * REGLA DE NEGOCIO: Una lista debería tener al menos tantos candidatos
-     * como bancas puede ganar
-     * 
-     * @param int $bancasGanadas
-     * @return bool
-     */
+    //Verificar si la lista tiene suficientes candidatos para las bancas ganadas
     public function tieneSuficientesCandidatos(int $bancasGanadas): bool
     {
         return $this->candidatos()->count() >= $bancasGanadas;
