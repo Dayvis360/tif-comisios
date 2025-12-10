@@ -72,8 +72,5 @@ class CandidatoTest extends TestCase
         $this->expectExceptionMessage("el orden en lista tiene que ser mayor a 0");
 
         $candidato->verificarQueSeaValido($repositoryMock);
-        
     }
-
-    public 
 }
