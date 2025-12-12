@@ -3,9 +3,39 @@
 namespace App\DAO;
 
 use App\Models\Lista;
+use Illuminate\Database\Eloquent\Collection;
 
 class ListaDAO
 {
+    // Obtener todas las listas como Collection con relaciones
+    public function obtenerTodas(): Collection
+    {
+        return Lista::with('provincia')
+            ->orderBy('provincia_id', 'asc')
+            ->orderBy('nombre', 'asc')
+            ->get();
+    }
+
+    // Buscar lista por ID con relaciones
+    public function buscarPorId(int $id): ?Lista
+    {
+        return Lista::with('provincia')->find($id);
+    }
+
+    // Buscar listas por provincia como Collection
+    public function buscarPorProvincia(int $provinciaId): Collection
+    {
+        return Lista::where('provincia_id', $provinciaId)->get();
+    }
+
+    // Buscar listas por provincia y cargo como Collection
+    public function buscarPorProvinciaYCargo(int $provinciaId, string $cargo): Collection
+    {
+        return Lista::where('provincia_id', $provinciaId)
+            ->where('cargo', $cargo)
+            ->get();
+    }
+
     //Obtener todas las listas
     public function getAll(): array
     {

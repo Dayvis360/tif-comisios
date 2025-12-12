@@ -3,9 +3,28 @@
 namespace App\DAO;
 
 use App\Models\Provincia;
+use Illuminate\Database\Eloquent\Collection;
 
 class ProvinciaDAO
 {
+    // Obtener todas las provincias como Collection (consistente con Repository)
+    public function obtenerTodas(): Collection
+    {
+        return Provincia::orderBy('nombre', 'asc')->get();
+    }
+
+    // Buscar provincia por ID y retornar modelo Eloquent
+    public function buscarPorId(int $id): ?Provincia
+    {
+        return Provincia::find($id);
+    }
+
+    // Buscar provincia por nombre y retornar modelo Eloquent
+    public function buscarPorNombre(string $nombre): ?Provincia
+    {
+        return Provincia::where('nombre', $nombre)->first();
+    }
+
     //Obtener todas las provincias
     public function getAll(): array
     {

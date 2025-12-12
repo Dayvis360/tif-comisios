@@ -18,17 +18,17 @@ class ProvinciaRepository
 
     public function obtenerTodas(): Collection
     {
-        return Provincia::orderBy('nombre', 'asc')->get();
+        return $this->provinciaDAO->obtenerTodas();
     }
 
     public function buscarPorId(int $id): ?Provincia
     {
-        return Provincia::find($id);
+        return $this->provinciaDAO->buscarPorId($id);
     }
 
     public function buscarPorNombre(string $nombre): ?Provincia
     {
-        return Provincia::where('nombre', $nombre)->first();
+        return $this->provinciaDAO->buscarPorNombre($nombre);
     }
 
     public function guardar(Provincia $provincia): void

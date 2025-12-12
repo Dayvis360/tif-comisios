@@ -18,22 +18,17 @@ class CandidatoRepository
 
     public function obtenerTodos(): Collection
     {
-        return Candidato::with('lista.provincia')
-            ->orderBy('lista_id')
-            ->orderBy('orden_en_lista')
-            ->get();
+        return $this->candidatoDAO->obtenerTodos();
     }
 
     public function buscarPorId(int $id): ?Candidato
     {
-        return Candidato::with('lista.provincia')->find($id);
+        return $this->candidatoDAO->buscarPorId($id);
     }
 
     public function buscarPorLista(int $listaId): Collection
     {
-        return Candidato::where('lista_id', $listaId)
-            ->orderBy('orden_en_lista')
-            ->get();
+        return $this->candidatoDAO->buscarPorLista($listaId);
     }
 
     public function guardar(Candidato $candidato): void

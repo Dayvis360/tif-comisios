@@ -18,22 +18,17 @@ class TelegramaRepository
 
     public function obtenerTodos(): Collection
     {
-        return Telegrama::with(['mesa.provincia', 'lista'])
-            ->orderBy('mesa_id')
-            ->orderBy('lista_id')
-            ->get();
+        return $this->telegramaDAO->obtenerTodos();
     }
 
     public function buscarPorId(int $id): ?Telegrama
     {
-        return Telegrama::with(['mesa.provincia', 'lista'])->find($id);
+        return $this->telegramaDAO->buscarPorId($id);
     }
 
     public function buscarPorMesa(int $mesaId): Collection
     {
-        return Telegrama::with('lista')
-            ->where('mesa_id', $mesaId)
-            ->get();
+        return $this->telegramaDAO->buscarPorMesa($mesaId);
     }
 
     public function guardar(Telegrama $telegrama): void
@@ -85,7 +80,7 @@ class TelegramaRepository
 
     public function obtenerPorLista(int $listaId): Collection
     {
-        return Telegrama::where('lista_id', $listaId)->get();
+        return $this->telegramaDAO->buscarPorLista($listaId);
     }
 
     public function guardarLote(array $telegramas): bool

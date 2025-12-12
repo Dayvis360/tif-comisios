@@ -2,7 +2,9 @@
 
 namespace App\DAO;
 
+use App\Models\Telegrama;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Collection;
 
 /**
  * TelegramaDAO
@@ -14,6 +16,43 @@ use Illuminate\Support\Facades\DB;
  */
 class TelegramaDAO
 {
+    /**
+     * Obtener todos los telegramas como Collection con relaciones
+     */
+    public function obtenerTodos(): Collection
+    {
+        return Telegrama::with(['mesa.provincia', 'lista'])
+            ->orderBy('mesa_id')
+            ->orderBy('lista_id')
+            ->get();
+    }
+
+    /**
+     * Buscar telegrama por ID con relaciones
+     */
+    public function buscarPorId(int $id): ?Telegrama
+    {
+        return Telegrama::with(['mesa.provincia', 'lista'])->find($id);
+    }
+
+    /**
+     * Buscar telegramas por mesa como Collection
+     */
+    public function buscarPorMesa(int $mesaId): Collection
+    {
+        return Telegrama::with('lista')
+            ->where('mesa_id', $mesaId)
+            ->get();
+    }
+
+    /**
+     * Buscar telegramas por lista como Collection
+     */
+    public function buscarPorLista(int $listaId): Collection
+    {
+        return Telegrama::where('lista_id', $listaId)->get();
+    }
+
     /**
      * Obtener todos los telegramas
      */

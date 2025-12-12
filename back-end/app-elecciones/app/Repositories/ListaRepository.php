@@ -18,17 +18,17 @@ class ListaRepository
 
     public function obtenerTodas(): Collection
     {
-        return Lista::with('provincia')->orderBy('provincia_id')->orderBy('nombre')->get();
+        return $this->listaDAO->obtenerTodas();
     }
 
     public function buscarPorId(int $id): ?Lista
     {
-        return Lista::with('provincia')->find($id);
+        return $this->listaDAO->buscarPorId($id);
     }
 
     public function buscarPorProvincia(int $provinciaId): Collection
     {
-        return Lista::where('provincia_id', $provinciaId)->get();
+        return $this->listaDAO->buscarPorProvincia($provinciaId);
     }
 
     public function guardar(Lista $lista): void
@@ -65,8 +65,6 @@ class ListaRepository
 
     public function obtenerPorProvinciaYCargo(int $provinciaId, string $cargo): Collection
     {
-        return Lista::where('provincia_id', $provinciaId)
-            ->where('cargo', $cargo)
-            ->get();
+        return $this->listaDAO->buscarPorProvinciaYCargo($provinciaId, $cargo);
     }
 }

@@ -18,19 +18,17 @@ class MesaRepository
 
     public function obtenerTodas(): Collection
     {
-        return Mesa::with('provincia')->orderBy('provincia_id')->orderBy('circuito')->get();
+        return $this->mesaDAO->obtenerTodas();
     }
 
     public function buscarPorId(int $id): ?Mesa
     {
-        return Mesa::with('provincia')->find($id);
+        return $this->mesaDAO->buscarPorId($id);
     }
 
     public function buscarPorProvincia(int $provinciaId): Collection
     {
-        return Mesa::where('provincia_id', $provinciaId)
-            ->orderBy('circuito')
-            ->get();
+        return $this->mesaDAO->buscarPorProvincia($provinciaId);
     }
 
     public function guardar(Mesa $mesa): void

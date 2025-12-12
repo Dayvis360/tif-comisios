@@ -3,9 +3,33 @@
 namespace App\DAO;
 
 use App\Models\Mesa;
+use Illuminate\Database\Eloquent\Collection;
 
 class MesaDAO
 {
+    // Obtener todas las mesas como Collection con relaciones
+    public function obtenerTodas(): Collection
+    {
+        return Mesa::with('provincia')
+            ->orderBy('provincia_id', 'asc')
+            ->orderBy('circuito', 'asc')
+            ->get();
+    }
+
+    // Buscar mesa por ID con relaciones
+    public function buscarPorId(int $id): ?Mesa
+    {
+        return Mesa::with('provincia')->find($id);
+    }
+
+    // Buscar mesas por provincia como Collection
+    public function buscarPorProvincia(int $provinciaId): Collection
+    {
+        return Mesa::where('provincia_id', $provinciaId)
+            ->orderBy('circuito')
+            ->get();
+    }
+
     //Obtener todas las mesas con provincia
     public function getAll(): array
     {

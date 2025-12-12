@@ -3,9 +3,33 @@
 namespace App\DAO;
 
 use App\Models\Candidato;
+use Illuminate\Database\Eloquent\Collection;
 
 class CandidatoDAO
 {
+    // Obtener todos los candidatos como Collection con relaciones
+    public function obtenerTodos(): Collection
+    {
+        return Candidato::with(['lista.provincia'])
+            ->orderBy('lista_id', 'asc')
+            ->orderBy('orden_en_lista', 'asc')
+            ->get();
+    }
+
+    // Buscar candidato por ID con relaciones
+    public function buscarPorId(int $id): ?Candidato
+    {
+        return Candidato::with('lista.provincia')->find($id);
+    }
+
+    // Buscar candidatos por lista como Collection
+    public function buscarPorLista(int $listaId): Collection
+    {
+        return Candidato::where('lista_id', $listaId)
+            ->orderBy('orden_en_lista')
+            ->get();
+    }
+
     //Obtener todos los candidatos
     public function getAll(): array
     {
