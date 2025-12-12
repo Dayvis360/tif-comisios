@@ -1,0 +1,131 @@
+Guía de usuario — Aplicación TIF-COMISIOS
+
+Resumen
+-el proyecto se trata de realizar un panorama total o individual de los votos de diputados y senadores en los comisios del año 2025, osea que se van a poder visualisar distintos partidos y los votos que obtuvieron en las provincias
+asi como tambien se van a poder cargar telegramas(de a un partido por telegrama) y tambien podemos importar y exportar datos hacia la base de datos.
+- Repositorio con dos proyectos: backend Laravel (back-end/app-elecciones) y frontend Vue (front_comisios).
+- Esta guía cubre instalación, configuración, ejecución y pruebas básicas en entorno de desarrollo (Windows PowerShell).
+
+
+Requisitos previos
+- PHP 8.2 o superior (requerido por Laravel 12)
+- Descargar Composer desde su pagina oficial: https://getcomposer.org/
+- Descargar Node.js versión 20.x o >=22.12.0 y npm desde la pagina oficial: https://nodejs.org/es
+- Base de datos (MySQL/MariaDB/PostgreSQL) o SQLite
+- Git (opcional pero recomendado)
+
+Backend (Laravel)
+1) Instalar dependencias
+  cd c:\Users\Pc\Desktop\tif\tif-comisios\back-end\app-elecciones
+  composer install
+
+2) Crear archivo de entorno
+  cp .env.example .env
+  (En PowerShell: copy .env.example .env)
+
+3) Configurar la base de datos en .env
+- Editar las variables DB_CONNECTION, DB_HOST, DB_PORT, DB_DATABASE, DB_USERNAME, DB_PASSWORD.
+- Para usar SQLite: en .env establecer DB_CONNECTION=sqlite y crear el archivo database\database.sqlite (touch puede no existir en Windows — crear archivo manualmente).
+
+
+4) Ejecutar migraciones y seeders(los seeders fueron previamente cargados)
+  php artisan migrate(que ejecuta las migraciones)
+  php artisan db:seed(para iniciar la base de datos con datos que hallamos definido previamente en su respectivo archivo)
+
+5) (Opcional) Utilizar el script composer dev para levantar backend y frontend conjuntamente
+  composer dev
+  - Este script utiliza npx concurrently para ejecutar `php artisan serve`, `php artisan queue:listen` y `npm run dev`.
+
+6) Levantar servidor manualmente
+  php artisan serve --host=127.0.0.1 --port=8000
+
+7) Ejecutar tests del backend
+  php artisan test
+  - Correr un test específico: php artisan test --testsuite=Unit --filter=TelegramaTest
+
+8) Logs y storage
+  - Directorio de logs: storage/logs
+  - Si hay problemas de permisos: dar permisos al directorio storage y bootstrap/cache
+
+Frontend (Vue + Vite)
+1) Instalar dependencias
+  cd c:\Users\Pc\Desktop\tifmaxifront(mi carpeta, puede tener un nombre diferente)\front_comisios
+  npm install
+
+2) Configurar la URL de la API
+- Por defecto `src/services/api.js` usa baseURL http://127.0.0.1:8000/api
+- Para cambiarla, editar `baseURL` en `src/services/api.js` o modificar el código para leer de una variable de entorno (ej: VITE_API_URL).
+
+3) Levantar servidor de desarrollo
+  npm run dev
+  - Abrir: normalmente http://localhost:5173 (Vite mostrará la URL en consola)
+
+
+4) Pruebas del frontend
+ 
+Uso básico de la aplicación
+- Abrir el frontend en el navegador (después de `npm run dev`) y la app consumirá la API en el backend (asegurar que el backend esté corriendo en 127.0.0.1:8000 o ajustar `baseURL`).
+- Operaciones principales disponibles via UI/API:
+  - CRUD Telegramas
+  - Visualizar resultados nacionales/provinciales y exportarlos
+  - Importar telegramas vía endpoint `/api/telegramas/importar` (multipart/form-data)
+
+Pruebas y desarrollo
+- Tests Laravel: php artisan test
+- Tests unitarios concretos: php artisan test --testsuite=Unit --filter=TelegramaTest
+- Ejecutar las factories y seeders para poblar datos de prueba
+- Para depuración, usar `dd()` o `dump()` en backend; la consola de Vite para errores frontend
+
+Sugerencias y resolución de problemas
+- Error de dependencias Composer: ejecutar `composer update` y verificar la versión de PHP
+- Error de npm/node: verificar `node -v` y `npm -v`; asegúrate de cumplir requisito de `package.json` (Node 20.x o >=22)
+- Problemas con CORS: si el frontend y backend están en distintos orígenes, revisar `config/cors.php` y `.env` si tiene `SANCTUM` o configuración de cookie
+- Si el puerto 8000 está ocupado, usar `--port` con `php artisan serve` y cambiar `api.baseURL` en `src/services/api.js` en el frontend
+
+Rutas y endpoints principales (muestra)
+- //PROVINCIAS
+Route::get('/provincias', [ProvinciaController::class, 'index']);
+Route::get('/provincias/{id}', [ProvinciaController::class, 'show']);
+Route::post('/provincias', [ProvinciaController::class, 'store']);
+Route::put('/provincias/{id}', [ProvinciaController::class, 'update']);
+Route::delete('/provincias/{id}', [ProvinciaController::class, 'destroy']);
+
+//  MESAS 
+Route::get('/mesas', [MesaController::class, 'index']);
+Route::get('/mesas/{id}', [MesaController::class, 'show']);
+Route::post('/mesas', [MesaController::class, 'store']);
+Route::put('/mesas/{id}', [MesaController::class, 'update']);
+Route::delete('/mesas/{id}', [MesaController::class, 'destroy']);
+
+//  LISTAS 
+Route::get('/listas', [ListaController::class, 'index']);
+Route::get('/listas/{id}', [ListaController::class, 'show']);
+Route::post('/listas', [ListaController::class, 'store']);
+Route::put('/listas/{id}', [ListaController::class, 'update']);
+Route::delete('/listas/{id}', [ListaController::class, 'destroy']);
+
+//  CANDIDATOS 
+Route::get('/candidatos', [CandidatoController::class, 'index']);
+Route::get('/candidatos/{id}', [CandidatoController::class, 'show']);
+Route::post('/candidatos', [CandidatoController::class, 'store']);
+Route::put('/candidatos/{id}', [CandidatoController::class, 'update']);
+Route::delete('/candidatos/{id}', [CandidatoController::class, 'destroy']);
+
+//  TELEGRAMAS 
+Route::get('/telegramas', [TelegramaController::class, 'index']); // Soporta filtros: ?provincia_id=1&cargo=DIPUTADOS&lista_id=2&mesa_desde=1&mesa_hasta=10
+Route::get('/telegramas/{id}', [TelegramaController::class, 'show']);
+Route::post('/telegramas', [TelegramaController::class, 'store']);
+Route::post('/telegramas/importar', [TelegramaController::class, 'importar']); // Importar CSV/JSON
+Route::put('/telegramas/{id}', [TelegramaController::class, 'update']);
+Route::delete('/telegramas/{id}', [TelegramaController::class, 'destroy']);
+
+Documentación adicional
+- API: revisar README_API.md en la raíz del frontend
+- Backend: ver rutas en routes/api.php y la estructura en app/Http/Controllers 
+
+
+Contacto
+- Para dudas internas, revisar los issues del repo o revisar la documentacion.
+
+Fin de la guía
+ 
